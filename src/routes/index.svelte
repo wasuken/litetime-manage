@@ -6,6 +6,13 @@
   dayjs.extend(utc);
   import {onMount} from "svelte";
 
+  let minSec = {
+	min: 0,
+	sec: 0,
+	hour: 0,
+  };
+  let isDateTimeLocal = false;
+
   let time = dayjs();
   userInput.set({
     title: "",
@@ -43,6 +50,15 @@
     };
   });
   function add() {
+	if(!isDateTimeLocal){
+	  userInput.set({
+		...$userInput,
+		timer: dayjs()
+		  .add(minSec.min, 'm')
+		  .add(minSec.sec, 's')
+		  .add(minSec.hour, 'h'),
+	  });
+	}
     if ($userInput.active) {
       let nTasks = [...$activeTasks];
       nTasks.push({...$userInput});
@@ -83,26 +99,70 @@
     </div>
     <div class="col-md-6 col-xs-12">
       <div class="input-group mb-3">
-        <span class="input-group-text" id="input-timer"> 時間 </span>
-        <input
-          id="input-timer"
-          class="form-control"
-          type="datetime-local"
-          bind:value={$userInput.timer}
-        />
+
+		{#if isDateTimeLocal}
+		  <span class="input-group-text" id="input-timer"> 時間 </span>
+		  <input
+			id="input-timer"
+			class="form-control"
+			type="datetime-local"
+			bind:value={$userInput.timer}
+			/>
+		  {:else}
+		  <span class="input-group-text" id="input-hour"> 時間 </span>
+		  <input
+			id="input-hour"
+			class="form-control"
+			type="number"
+			min="0"
+			max="24"
+			bind:value={minSec.hour}
+			/>
+		  <span class="input-group-text" id="input-min"> 分 </span>
+		  <input
+			id="input-min"
+			class="form-control"
+			type="number"
+			min="0"
+			max="59"
+			bind:value={minSec.min}
+			/>
+		  <span class="input-group-text" id="input-sec"> 秒 </span>
+		  <input
+			id="input-sec"
+			class="form-control"
+			type="number"
+			min="0"
+			max="59"
+			bind:value={minSec.sec}
+			/>
+		  {/if}
       </div>
     </div>
     <div class="col-md-6 col-xs-12">
       <div class="input-group mb-3">
-        <span class="form-check-label" id="input-active">
-          {$userInput.active ? "アクティブ" : "パッシブ"}
-        </span>
-        <input
-          id="input-active"
-          class="form-check-input"
-          type="checkbox"
-          bind:checked={$userInput.active}
-        />
+        <div class="p-2">
+		  <span class="form-check-label" id="input-active">
+			{$userInput.active ? "アクティブ" : "パッシブ"}
+          </span>
+          <input
+			id="input-active"
+			class="form-check-input"
+			type="checkbox"
+			bind:checked={$userInput.active}
+			/>
+		</div>
+		<div class="p-2">
+		  <span class="form-check-label" id="input-min-sec">
+			{isDateTimeLocal ? '時間指定' : '分秒指定'}
+          </span>
+          <input
+			id="input-min-sec"
+			class="form-check-input"
+			type="checkbox"
+			bind:checked={isDateTimeLocal}
+			/>
+		</div>
       </div>
     </div>
     <div class="col-12">

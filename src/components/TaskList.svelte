@@ -41,11 +41,15 @@
   <ul class="list-group">
     {#each tasks as task, i}
       <li class="list-group-item">
-        {dayjs(task.timer).format("YYYY-MM-DD HH:mm:ss")} :
-        {task.title}:
-        {task.active ? "アクティブ" : "パッシブ"}
+		<span class="badge {task.active ? 'bg-primary' : 'bg-secondary'}">
+		  {dayjs(task.timer).format("YYYY-MM-DD HH:mm:ss")}
+		</span>
+        <p>
+		  {task.title}
+		</p>
+		<hr/>
         <button
-          class="btn btn-secondary"
+          class="btn {task.active ? 'btn-primary' : 'btn-secondary'}"
           on:click={() => active(i, !task.active)}
           >{!task.active ? "アクティブ" : "パッシブ"}</button
         >
