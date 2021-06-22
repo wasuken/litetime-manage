@@ -5,6 +5,7 @@
   import utc from "dayjs/plugin/utc.js";
   dayjs.extend(utc);
   import {onMount} from "svelte";
+
   let time = dayjs();
   userInput.set({
     title: "",
@@ -21,6 +22,7 @@
         console.log(dayjs(x.timer).diff(time));
         if (dayjs(x.timer).diff(time) <= 0) {
           nTasks.push({...x, active: false});
+		  document.querySelector('#sound-file').play();
           alert(`[${x.title}] :経過`);
         } else {
           naTasks.push(x);
@@ -64,6 +66,9 @@
 </svelte:head>
 
 <div class="container-fluid">
+  <audio id="sound-file" preload="auto">
+	<source src="/Onmtp-Ding04-1.mp3" type="audio/mp3">
+  </audio>
   <div class="row">
     <div class="col-md-6 col-xs-12">
       <div class="input-group mb-3">
