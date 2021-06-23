@@ -41,6 +41,10 @@
   <ul class="list-group">
     {#each tasks as task, i}
       <li class="list-group-item">
+		{#if task.active}
+		  {dayjs(task.timer).diff(dayjs(), 's')} 秒
+		<hr />
+	  {/if}
 		<span class="badge {task.active ? 'bg-primary' : 'bg-secondary'}">
 		  {dayjs(task.timer).format("YYYY-MM-DD HH:mm:ss")}
 		</span>
