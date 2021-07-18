@@ -84,6 +84,7 @@
 <div class="container-fluid">
   <audio id="sound-file" preload="auto">
 	<source src="/Onmtp-Ding04-1.mp3" type="audio/mp3">
+	  <track kind="captions" label="English captions" src="" srclang="en" default>
   </audio>
   <div class="row">
     <div class="col-md-6 col-xs-12">
