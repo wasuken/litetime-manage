@@ -9,6 +9,12 @@
   userInput.set({
     title: "",
     timer: "",
+	timer_display: {
+	  min: 0,
+	  sec: 0,
+	  hour: 0,
+	},
+	keyword: "",
   });
 
   export let tasks = [];
@@ -34,13 +40,20 @@
     remove(ind);
     userInput.set({...rTask});
   }
+  function duplicate(ind){
+	const rTask = tasks[ind];
+	let nTasks = [...tasks];
+	nTasks.push(rTask);
+    tasks = nTasks;
+    userInput.set({...rTask});
+  }
 </script>
 
-<div class="container-fluid">
+<div class="container-fluid shadow p-3 mb-5 bg-body rounded">
   <h3>{title}</h3>
   <ul class="list-group">
     {#each tasks as task, i}
-      <li class="list-group-item">
+      <li class="list-group-item m-2">
 		{#if task.active}
 		  {dayjs(task.timer).diff(dayjs(), 's')} 秒
 		<hr />
@@ -61,6 +74,7 @@
           >remove</button
         >
         <button class="btn btn-secondary" on:click={() => edit(i)}>edit</button>
+		<button class="btn btn-secondary" on:click={() => duplicate(i)}>duplicate</button>
       </li>
     {/each}
   </ul>
