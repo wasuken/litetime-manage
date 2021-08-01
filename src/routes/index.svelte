@@ -1,6 +1,9 @@
 <script>
-  import Tasks from "../components/TaskList.svelte";
-  import {userInput, tasks, activeTasks} from "../stores/tasks.js";
+  import TaskList from "../components/TaskList.svelte";
+  import Keywords from "../components/Keywords.svelte";
+  import TaskAdd from "../components/TaskAdd.svelte";
+  import {userInput, tasks} from "../stores/tasks.js";
+
   import dayjs from "dayjs";
   import utc from "dayjs/plugin/utc.js";
   dayjs.extend(utc);
@@ -25,37 +28,71 @@
     active: false,
 	keyword: "",
   });
-
-  // userInput.subscribe((uInput) => {
-  // 	userInput.set({
-  // 	  ...$userInput,
-  // 	  timer: dayjs()
-  // 		.add(minSec.min, 'm')
-  // 		.add(minSec.sec, 's')
-  // 		.add(minSec.hour, 'h'),
-  // 	});
-  // });
+  let activeTasks = [];
+  let passiveTasks = [];
+  tasks.subscribe((ts) => {
+	function removeF(ind) {
+      return () => {
+		let nTasks = [...$tasks];
+		nTasks.splice(ind, 1);
+		tasks.set(nTasks);
+	  }
+	}
+	function activeF(ind) {
+      return (bl) => {
+		let nTasks = [...$tasks];
+		if (dayjs(nTasks[ind].timer).diff(dayjs()) <= 0) {
+		  nTasks[ind].timer = dayjs().add("5", "m");
+		}
+		nTasks[ind].active = bl;
+		tasks.set(nTasks);
+	  };
+	}
+	function editF(ind) {
+      return () => {
+		const rTask = $tasks[ind];
+		removeF(ind)();
+		userInput.set({...rTask});
+	  }
+	}
+	function duplicateF(ind){
+	  return () => {
+		let nTasks = [...$tasks];
+		nTasks.push({...$tasks[ind]});
+		tasks.set(nTasks);
+	  }
+	}
+	activeTasks = [];
+	passiveTasks = [];
+	ts.forEach((t, i) => {
+	  let tt = {
+		...t,
+		remove: removeF(i),
+		edit: editF(i),
+		change_active: activeF(i),
+		duplicate: duplicateF(i),
+	  }
+	  if(tt.active){
+		activeTasks.push(tt);
+	  }else{
+		passiveTasks.push(tt);
+	  }
+	});
+  });
 
   const title = "タスクアラート";
   $: {
-    let nTasks = [];
-    let naTasks = [];
-    [...$tasks, ...$activeTasks].forEach((x) => {
+	let tks = [...$tasks];
+    $tasks.forEach((x, i) => {
       if (x.active === true) {
-        console.log(dayjs(x.timer).diff(time));
         if (dayjs(x.timer).diff(time) <= 0) {
-          nTasks.push({...x, active: false});
+		  tks[i] = {...x, active: false};
 		  document.querySelector('#sound-file').play();
           alert(`[${x.title}] :経過`);
-        } else {
-          naTasks.push(x);
         }
-      } else {
-        nTasks.push(x);
       }
     });
-    tasks.set(nTasks);
-    activeTasks.set(naTasks);
+    tasks.set(tks);
   }
   onMount(() => {
     const interval = setInterval(() => {
@@ -75,15 +112,9 @@
 		  .add($userInput.timer_display.hour, 'h'),
 	  });
 	}
-    if ($userInput.active) {
-      let nTasks = [...$activeTasks];
-      nTasks.push({...$userInput});
-      activeTasks.set(nTasks);
-    } else {
-      let nTasks = [...$tasks];
-      nTasks.push({...$userInput});
-      tasks.set(nTasks);
-    }
+	let nTasks = [...$tasks];
+    nTasks.push({...$userInput});
+    tasks.set(nTasks);
     userInput.set({
       title: "",
       timer: dayjs(),
@@ -114,132 +145,20 @@
 	  <track kind="captions" label="English captions" src="" srclang="en" default>
   </audio>
   <div class="container-fluid">
-	<button class="btn btn-primary m-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInput" aria-expanded="false" aria-controls="collapseInput">
-	  入力
-	</button>
-	<div class="collapse container shadow p-3 mb-5 bg-body rounded" id="collapseInput">
-	  <div class="row">
-		<div class="col-md-6 col-xs-12">
-		  <div class="input-group mb-3">
-			<span class="input-group-text" id="input-title"> 題名 </span>
-			<input
-			  id="input-title"
-			  class="form-control"
-			  type="text"
-			  bind:value={$userInput.title}
-			  />
-		  </div>
-		</div>
-		<div class="col-md-6 col-xs-12">
-		  <div class="input-group mb-3">
-
-			{#if isDateTimeLocal}
-			  <span class="input-group-text" id="input-timer"> 時間 </span>
-			  <input
-				id="input-timer"
-				class="form-control"
-				type="datetime-local"
-				bind:value={$userInput.timer}
-				/>
-			  {:else}
-				<span class="input-group-text" id="input-hour"> 時間 </span>
-				<input
-				  id="input-hour"
-				  class="form-control"
-				  type="number"
-				  min="0"
-				  max="24"
-				  bind:value={$userInput.timer_display.hour}
-				  />
-				<span class="input-group-text" id="input-min"> 分 </span>
-				<input
-				  id="input-min"
-				  class="form-control"
-				  type="number"
-				  min="0"
-				  max="59"
-				  bind:value={$userInput.timer_display.min}
-				  />
-				<span class="input-group-text" id="input-sec"> 秒 </span>
-				<input
-				  id="input-sec"
-				  class="form-control"
-				  type="number"
-				  min="0"
-				  max="59"
-				  bind:value={$userInput.timer_display.sec}
-				  />
-				{/if}
-			  </div>
-		</div>
-		<div class="col-md-12 col-xs-12">
-		  <div class="input-group mb-3">
-			<div class="p-2">
-			  <span class="form-check-label" id="input-active">
-				{$userInput.active ? "アクティブ" : "パッシブ"}
-			  </span>
-			  <input
-				id="input-active"
-				class="form-check-input"
-				type="checkbox"
-				bind:checked={$userInput.active}
-				/>
-			</div>
-			<div class="p-2">
-			  <span class="form-check-label" id="input-min-sec">
-				{isDateTimeLocal ? '時間指定' : '分秒指定'}
-			  </span>
-			  <input
-				id="input-min-sec"
-				class="form-check-input"
-				type="checkbox"
-				bind:checked={isDateTimeLocal}
-				/>
-			</div>
-		  </div>
-		</div>
-		<div class="col-md-6 col-xs-12">
-		  <div class="input-group mb-3">
-			<span class="input-group-text" id="input-title"> キーワード </span>
-			<input
-			  id="input-keyword"
-			  class="form-control"
-			  type="text"
-			  bind:value={$userInput.keyword}
-			  on:input={handleInputKeyword}
-			  />
-		  </div>
-		</div>
-		<div class="col-md-6 col-xs-12">
-		  <div class="input-group mb-3 fs-5">
-			{#if $userInput.keyword.length > 0}
-			  {#each $userInput.keyword.split(' ') as w}
-				<div class="m-1 badge bg-info text-dark">{w}</div>
-			  {/each}
-			{/if}
-		  </div>
-		</div>
-		<div class="col-12">
-		  <div class="input-group mb-3">
-			<button class="btn btn-primary" on:click={() => add()}>追加</button>
-		  </div>
-		</div>
-	  </div>
-	</div>
+	<TaskAdd />
+	<Keywords />
   </div>
   <div class="row">
     <div class="col-md-6 col-xs-12">
-      <Tasks
-        bind:tasks={$activeTasks}
+      <TaskList
+        tks={activeTasks}
         title="アクティブタスクリスト"
-        defaultActive={true}
 		/>
     </div>
     <div class="col-md-6 col-xs-12">
-      <Tasks
-        bind:tasks={$tasks}
+      <TaskList
+        tks={passiveTasks}
         title="パッシブタスクリスト"
-        defaultActive={false}
 		/>
     </div>
   </div>
@@ -247,6 +166,6 @@
 
 <svelte:head>
   <title>{title}</title>
-  <link href="/bootstrap.min.css" rel="stylesheet" />
-  <script src="/bootstrap.bundle.min.js"></script>
-</svelte:head>
+  <link href="/bootstrap.min.css" rel="stylesheet" defer />
+  <script src="/bootstrap.bundle.min.js" defer></script>
+  </svelte:head>
