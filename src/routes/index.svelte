@@ -2,7 +2,7 @@
   import TaskList from "../components/TaskList.svelte";
   import Keywords from "../components/Keywords.svelte";
   import TaskAdd from "../components/TaskAdd.svelte";
-  import {userInput, tasks} from "../stores/tasks.js";
+  import {userInput, tasks, saveTasks} from "../stores/tasks.js";
 
   import dayjs from "dayjs";
   import utc from "dayjs/plugin/utc.js";
@@ -30,6 +30,23 @@
   });
   let activeTasks = [];
   let passiveTasks = [];
+
+  function handleSaveTasks(){
+	localStorage.setItem('tasks', JSON.stringify($tasks));
+  }
+
+  onMount(
+	() => {
+	  let storedTasks = [];
+	  try{
+		storedTasks = JSON.parse(localStorage.getItem('tasks') ?? '[]');
+	  }catch(e){
+		console.log(e);
+		storedTasks = [];
+	  }
+	  tasks.set(storedTasks);
+	}
+  )
 
   const title = "タスクアラート";
   $: {
@@ -64,40 +81,6 @@
       clearInterval(interval);
     };
   });
-  function add() {
-	if(!isDateTimeLocal){
-	  userInput.set({
-		...$userInput,
-		timer: dayjs()
-		  .add($userInput.timer_display.min, 'm')
-		  .add($userInput.timer_display.sec, 's')
-		  .add($userInput.timer_display.hour, 'h'),
-	  });
-	}
-	let nTasks = [...$tasks];
-	let i = nTasks.length;
-    nTasks.push(
-	  {
-		...$userInput,
-		remove: removeF(i),
-		edit: editF(i),
-		change_active: activeF(i),
-		duplicate: duplicateF(i),
-	  }
-	);
-    tasks.set(nTasks);
-    userInput.set({
-      title: "",
-      timer: dayjs(),
-	  timer_display: {
-		min: 0,
-		sec: 0,
-		hour: 0,
-	  },
-      active: false,
-	  keyword: "",
-    });
-  }
   function handleInputKeyword(e){
 	if(e.data === " "){
 	  const kws = $userInput.keyword.split(' ');
@@ -116,6 +99,11 @@
 	  <track kind="captions" label="English captions" src="" srclang="en" default>
   </audio>
   <div class="container-fluid">
+	<div>
+	  <button class="btn btn-primary m-3" on:click={() => handleSaveTasks()}>
+		SaveTasks
+	  </button>
+	</div>
 	<TaskAdd />
 	<Keywords />
   </div>
