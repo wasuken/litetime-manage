@@ -30,55 +30,6 @@
   });
   let activeTasks = [];
   let passiveTasks = [];
-  tasks.subscribe((ts) => {
-	function removeF(ind) {
-      return () => {
-		let nTasks = [...$tasks];
-		nTasks.splice(ind, 1);
-		tasks.set(nTasks);
-	  }
-	}
-	function activeF(ind) {
-      return (bl) => {
-		let nTasks = [...$tasks];
-		if (dayjs(nTasks[ind].timer).diff(dayjs()) <= 0) {
-		  nTasks[ind].timer = dayjs().add("5", "m");
-		}
-		nTasks[ind].active = bl;
-		tasks.set(nTasks);
-	  };
-	}
-	function editF(ind) {
-      return () => {
-		const rTask = $tasks[ind];
-		removeF(ind)();
-		userInput.set({...rTask});
-	  }
-	}
-	function duplicateF(ind){
-	  return () => {
-		let nTasks = [...$tasks];
-		nTasks.push({...$tasks[ind]});
-		tasks.set(nTasks);
-	  }
-	}
-	activeTasks = [];
-	passiveTasks = [];
-	ts.forEach((t, i) => {
-	  let tt = {
-		...t,
-		remove: removeF(i),
-		edit: editF(i),
-		change_active: activeF(i),
-		duplicate: duplicateF(i),
-	  }
-	  if(tt.active){
-		activeTasks.push(tt);
-	  }else{
-		passiveTasks.push(tt);
-	  }
-	});
-  });
 
   const title = "タスクアラート";
   $: {
@@ -94,6 +45,17 @@
     });
     tasks.set(tks);
   }
+  tasks.subscribe((ts) => {
+	activeTasks = [];
+	passiveTasks = [];
+	ts.forEach((t, i) => {
+	  if(t.active){
+		activeTasks.push(t);
+	  }else{
+		passiveTasks.push(t);
+	  }
+	});
+  });
   onMount(() => {
     const interval = setInterval(() => {
       time = dayjs();
@@ -113,7 +75,16 @@
 	  });
 	}
 	let nTasks = [...$tasks];
-    nTasks.push({...$userInput});
+	let i = nTasks.length;
+    nTasks.push(
+	  {
+		...$userInput,
+		remove: removeF(i),
+		edit: editF(i),
+		change_active: activeF(i),
+		duplicate: duplicateF(i),
+	  }
+	);
     tasks.set(nTasks);
     userInput.set({
       title: "",
