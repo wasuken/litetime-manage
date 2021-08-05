@@ -39,7 +39,11 @@
 	() => {
 	  let storedTasks = [];
 	  try{
-		storedTasks = JSON.parse(localStorage.getItem('tasks') ?? '[]');
+		let ts = localStorage.getItem('tasks');
+		if(!ts){
+		  ts = '[]';
+		}
+		storedTasks = JSON.parse(localStorage.getItem('tasks'));
 	  }catch(e){
 		console.log(e);
 		storedTasks = [];
