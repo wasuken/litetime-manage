@@ -60,7 +60,18 @@ export function duplicateF(ind){
         edit: editF(k),
         change_active: activeF(k),
         duplicate: duplicateF(k),
+		changeCheck: changeCheckF(k),
 	  };
+	  return tts;
+	})
+  }
+}
+
+export function changeCheckF(ind){
+  return (i, b) => {
+	tasks.update((ts) => {
+	  let tts = {...ts};
+	  tts[ind].checkList[i].checked = b;
 	  return tts;
 	})
   }

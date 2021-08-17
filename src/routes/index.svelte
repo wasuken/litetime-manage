@@ -3,7 +3,14 @@
   import Keywords from "../components/Keywords.svelte";
   import TaskAdd from "../components/TaskAdd.svelte";
   import {userInput, tasks, saveTasks} from "../stores/tasks.js";
-  import {genUKey, removeF, activeF, editF, duplicateF} from "../const.js";
+  import {
+    genUKey,
+    removeF,
+    activeF,
+    editF,
+    duplicateF,
+    changeCheckF,
+  } from "../const.js";
 
   import dayjs from "dayjs";
   import utc from "dayjs/plugin/utc.js";
@@ -28,6 +35,7 @@
     },
     active: false,
     keyword: "",
+    checkListText: "",
   });
   let activeTasks = [];
   let passiveTasks = [];
@@ -51,6 +59,7 @@
           edit: editF(k),
           change_active: activeF(k),
           duplicate: duplicateF(k),
+          changeCheck: changeCheckF(k),
         };
       });
     } catch (e) {
