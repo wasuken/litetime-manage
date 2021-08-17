@@ -44,7 +44,6 @@
         ts = "{}";
       }
       storedTasks = JSON.parse(ts);
-      console.log(storedTasks);
       Object.keys(storedTasks).forEach((k) => {
         storedTasks[k] = {
           ...storedTasks[k],
