@@ -42,7 +42,13 @@ export function activeF(ind) {
 export function editF(ind) {
   return () => {
 	tasks.update((ts) => {
-	  userInput.set({...ts[ind]});
+	  console.log(ts);
+	  let t = {
+		...ts[ind],
+		checkListText: ts[ind].checkList.map((c) => c.text).join(' ')
+	  }
+	  delete t['checkList'];
+	  userInput.set({...t});
 	  let tts = {...ts};
 	  delete tts[ind];
 	  return tts;
@@ -60,7 +66,18 @@ export function duplicateF(ind){
         edit: editF(k),
         change_active: activeF(k),
         duplicate: duplicateF(k),
+		changeCheck: changeCheckF(k),
 	  };
+	  return tts;
+	})
+  }
+}
+
+export function changeCheckF(ind){
+  return (i, b) => {
+	tasks.update((ts) => {
+	  let tts = {...ts};
+	  tts[ind].checkList[i].checked = b;
 	  return tts;
 	})
   }

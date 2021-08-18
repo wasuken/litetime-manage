@@ -4,7 +4,14 @@
   import utc from "dayjs/plugin/utc.js";
   dayjs.extend(utc);
   import {onMount} from "svelte";
-  import {genUKey, removeF, activeF, editF, duplicateF} from "../const.js";
+  import {
+    genUKey,
+    removeF,
+    activeF,
+    editF,
+    duplicateF,
+    changeCheckF,
+  } from "../const.js";
 
   let minSec = {
     min: 0,
@@ -24,6 +31,7 @@
     },
     active: false,
     keyword: "",
+    checkListText: "",
   });
   function add() {
     if (!isDateTimeLocal) {
@@ -38,13 +46,22 @@
     tasks.update((ts) => {
       const k = genUKey();
       let tts = {...ts};
+      const chks = $userInput.checkListText.split(" ").map((x) => {
+        return {
+          text: x,
+          checked: false,
+        };
+      });
       tts[k] = {
         ...$userInput,
         remove: removeF(k),
         edit: editF(k),
         change_active: activeF(k),
         duplicate: duplicateF(k),
+        changeCheck: changeCheckF(k),
+        checkList: chks,
       };
+      delete tts[k]["checkListText"];
       return tts;
     });
     userInput.set({
@@ -57,15 +74,30 @@
       },
       active: false,
       keyword: "",
+      checkListText: "",
     });
   }
   function handleInputKeyword(e) {
     if (e.data === " ") {
-      const kws = $userInput.keyword.split(" ");
-      const ukw = kws.filter((v, i, a) => a.indexOf(v) === i).join(" ");
+      const kws = $userInput.keyword
+        .split(" ")
+        .filter((v, i, a) => a.indexOf(v) === i)
+        .join(" ");
       userInput.set({
         ...$userInput,
-        keyword: ukw,
+        keyword: kws,
+      });
+    }
+  }
+  function handleInputCheckListText(e) {
+    if (e.data === " ") {
+      const chks = $userInput.checkListText
+        .split(" ")
+        .filter((v, i, a) => a.indexOf(v) === i)
+        .join(" ");
+      userInput.set({
+        ...$userInput,
+        checkListText: chks,
       });
     }
   }
@@ -166,7 +198,7 @@
     </div>
     <div class="col-md-6 col-xs-12">
       <div class="input-group mb-3">
-        <span class="input-group-text" id="input-title"> キーワード </span>
+        <span class="input-group-text" id="input-keyword"> キーワード </span>
         <input
           id="input-keyword"
           class="form-control"
@@ -181,6 +213,29 @@
         {#if $userInput.keyword.length > 0}
           {#each $userInput.keyword.split(" ") as w}
             <div class="m-1 badge bg-info text-dark">{w}</div>
+          {/each}
+        {/if}
+      </div>
+    </div>
+    <div class="col-md-6 col-xs-12">
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="input-check-list-text">
+          チェックリスト
+        </span>
+        <input
+          id="input-check-list-text"
+          class="form-control"
+          type="text"
+          bind:value={$userInput.checkListText}
+          on:input={handleInputCheckListText}
+        />
+      </div>
+    </div>
+    <div class="col-md-6 col-xs-12">
+      <div class="input-group mb-3 fs-5">
+        {#if $userInput.checkListText.length > 0}
+          {#each $userInput.checkListText.split(" ") as chk}
+            <div class="m-1 badge bg-info text-dark">{chk}</div>
           {/each}
         {/if}
       </div>
