@@ -2,7 +2,7 @@
   import TaskList from "../components/TaskList.svelte";
   import Keywords from "../components/Keywords.svelte";
   import TaskAdd from "../components/TaskAdd.svelte";
-  import {userInput, tasks, saveTasks} from "../stores/tasks.js";
+  import { userInput, tasks, saveTasks } from "../stores/tasks.js";
   import {
     genUKey,
     removeF,
@@ -15,7 +15,7 @@
   import dayjs from "dayjs";
   import utc from "dayjs/plugin/utc.js";
   dayjs.extend(utc);
-  import {onMount} from "svelte";
+  import { onMount } from "svelte";
 
   let minSec = {
     min: 0,
@@ -71,7 +71,7 @@
 
   const title = "タスクアラート";
   $: {
-    let tks = {...$tasks};
+    let tks = { ...$tasks };
     if ($tasks) {
       Object.keys($tasks).forEach((k, i) => {
         const t = $tasks[k];

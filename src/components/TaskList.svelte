@@ -2,9 +2,21 @@
   import successkid from "images/successkid.jpg";
   import dayjs from "dayjs";
   import utc from "dayjs/plugin/utc.js";
-  import {userInput, tasks} from "../stores/tasks.js";
+  import { onMount } from "svelte";
+  import { userInput, tasks } from "../stores/tasks.js";
   dayjs.extend(utc);
   export let title = "タスクアラート";
+
+  let nowDt = dayjs();
+
+  onMount(() => {
+    const interval = setInterval(() => {
+      nowDt = dayjs();
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  });
 
   userInput.set({
     title: "",
@@ -26,12 +38,12 @@
     {#each tks as task, i}
       <li class="list-group-item m-2">
         {#if task.active}
-          {dayjs(task.timer).diff(dayjs(), "s")} 秒
+          {dayjs(task.timer).diff(nowDt, "s")} 秒
           <hr />
+          <span class="badge {task.active ? 'bg-primary' : 'bg-secondary'}">
+            {dayjs(task.timer).format("YYYY-MM-DD HH:mm:ss")}
+          </span>
         {/if}
-        <span class="badge {task.active ? 'bg-primary' : 'bg-secondary'}">
-          {dayjs(task.timer).format("YYYY-MM-DD HH:mm:ss")}
-        </span>
         <span class="badge {task.active ? 'bg-primary' : 'bg-secondary'}">
           {task.timer_display.hour}時
           {task.timer_display.min}分

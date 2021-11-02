@@ -1,9 +1,9 @@
 <script>
-  import {userInput, tasks} from "../stores/tasks.js";
+  import { userInput, tasks } from "../stores/tasks.js";
   import dayjs from "dayjs";
   import utc from "dayjs/plugin/utc.js";
   dayjs.extend(utc);
-  import {onMount} from "svelte";
+  import { onMount } from "svelte";
   import {
     genUKey,
     removeF,
@@ -35,17 +35,18 @@
   });
   function add() {
     if (!isDateTimeLocal) {
-      userInput.set({
+      let ui = {
         ...$userInput,
         timer: dayjs()
           .add($userInput.timer_display.min, "m")
           .add($userInput.timer_display.sec, "s")
           .add($userInput.timer_display.hour, "h"),
-      });
+      };
+      userInput.set(ui);
     }
     tasks.update((ts) => {
       const k = genUKey();
-      let tts = {...ts};
+      let tts = { ...ts };
       const chks = $userInput.checkListText.split(" ").map((x) => {
         return {
           text: x,
@@ -61,6 +62,9 @@
         changeCheck: changeCheckF(k),
         checkList: chks,
       };
+      if (!$userInput.active) {
+        tts[k].passived_timer = dayjs();
+      }
       delete tts[k]["checkListText"];
       return tts;
     });
