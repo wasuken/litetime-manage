@@ -38,20 +38,14 @@
       detailOpenList[i] = 1;
     }
   }
-  $: {
-    console.log(tks);
-  }
 </script>
 
 <div class="container-fluid shadow p-3 mb-5 bg-body rounded">
   <h3>{title}</h3>
   <ul class="list-group">
     {#each tks as task, i}
-      <li class="list-group-item m-2 {task.active ? 'active-task' : 'passive-task'}">
+      <li class="list-cursor list-group-item m-2 {task.active ? 'active-task' : 'passive-task'}" on:click={() => handleDetail(i)}>
         <p>
-          <button class="btn-primary btn" on:click={() => handleDetail(i)}>
-            詳細
-          </button>
           {task.title}
         </p>
         {#if detailOpenList[i] !== undefined}
@@ -119,5 +113,8 @@
   }
   .detail-close {
     display: none !important;
+  }
+  .list-cursor{
+    cursor: pointer;
   }
 </style>
