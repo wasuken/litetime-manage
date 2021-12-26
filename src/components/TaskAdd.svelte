@@ -111,7 +111,7 @@
 </script>
 
 <div class="row">
-  <div class="col-md-6 col-xs-12">
+  <div class="col-md-12 col-xs-12">
     <div class="input-group mb-3">
       <span class="input-group-text" id="input-title"> 題名 </span>
       <input
@@ -122,44 +122,58 @@
       />
     </div>
   </div>
-  <div class="col-md-6 col-xs-12">
-    <div class="input-group mb-3">
+  <div class="col-md-12 col-xs-12">
+    <div class="row mb-3">
       {#if isDateTimeLocal}
-        <span class="input-group-text" id="input-timer"> 時間 </span>
-        <input
-          id="input-timer"
-          class="form-control"
-          type="datetime-local"
-          bind:value={$userInput.timer}
-        />
+        <div class="col-md-12 input-group">
+          <span class="input-group-text" id="input-timer"> 時間 </span>
+          <input
+            id="input-timer"
+            class="form-control"
+            type="datetime-local"
+            bind:value={$userInput.timer}
+          />
+        </div>
       {:else}
-        <span class="input-group-text" id="input-hour"> 時間 </span>
-        <input
-          id="input-hour"
-          class="form-control"
-          type="number"
-          min="0"
-          max="24"
-          bind:value={$userInput.timer_display.hour}
-        />
-        <span class="input-group-text" id="input-min"> 分 </span>
-        <input
-          id="input-min"
-          class="form-control"
-          type="number"
-          min="0"
-          max="59"
-          bind:value={$userInput.timer_display.min}
-        />
-        <span class="input-group-text" id="input-sec"> 秒 </span>
-        <input
-          id="input-sec"
-          class="form-control"
-          type="number"
-          min="0"
-          max="59"
-          bind:value={$userInput.timer_display.sec}
-        />
+        <div class="col-md-4 col-xs-12">
+          <div class="input-group">
+            <span class="input-group-text" id="input-hour"> 時間 </span>
+            <input
+              id="input-hour"
+              class="form-control"
+              type="number"
+              min="0"
+              max="24"
+              bind:value={$userInput.timer_display.hour}
+            />
+          </div>
+        </div>
+        <div class="col-md-4 col-xs-12">
+          <div class="input-group">
+            <span class="input-group-text" id="input-min"> 分 </span>
+            <input
+              id="input-min"
+              class="form-control"
+              type="number"
+              min="0"
+              max="59"
+              bind:value={$userInput.timer_display.min}
+            />
+          </div>
+        </div>
+        <div class="col-md-4 col-xs-12">
+          <div class="input-group">
+            <span class="input-group-text" id="input-sec"> 秒 </span>
+            <input
+              id="input-sec"
+              class="form-control"
+              type="number"
+              min="0"
+              max="59"
+              bind:value={$userInput.timer_display.sec}
+            />
+          </div>
+        </div>
       {/if}
     </div>
   </div>
