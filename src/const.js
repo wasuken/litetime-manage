@@ -58,6 +58,11 @@ export function activeF(ind) {
 }
 export function editF(ind) {
   return () => {
+    // 編集時、追加画面を開く。
+    // こんな感じの処理が多くなってきたら
+    // Hookみたいな感じで分ける。
+    const colps = document.querySelector('#collapseInput');
+    colps.classList.add("show");
     tasks.update((ts) => {
       let t = {
         ...ts[ind],

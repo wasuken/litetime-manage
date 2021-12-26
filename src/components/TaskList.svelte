@@ -30,67 +30,94 @@
     checkListText: "",
   });
   export let tks = [];
+  let detailOpenList = [];
+  function handleDetail(i) {
+    if (detailOpenList[i]) {
+      delete detailOpenList[i];
+    } else {
+      detailOpenList[i] = 1;
+    }
+  }
+  $: {
+    console.log(tks);
+  }
 </script>
 
 <div class="container-fluid shadow p-3 mb-5 bg-body rounded">
   <h3>{title}</h3>
   <ul class="list-group">
     {#each tks as task, i}
-      <li class="list-group-item m-2">
-        {#if task.active}
-          {dayjs(task.timer).diff(nowDt, "s")} 秒
-          <hr />
-          <span class="badge {task.active ? 'bg-primary' : 'bg-secondary'}">
-            {dayjs(task.timer).format("YYYY-MM-DD HH:mm:ss")}
-          </span>
-        {/if}
-        <span class="badge {task.active ? 'bg-primary' : 'bg-secondary'}">
-          {task.timer_display.hour}時
-          {task.timer_display.min}分
-          {task.timer_display.sec}秒
-        </span>
+      <li class="list-group-item m-2 {task.active ? 'active-task' : 'passive-task'}">
         <p>
+          <button class="btn-primary btn" on:click={() => handleDetail(i)}>
+            詳細
+          </button>
           {task.title}
         </p>
-        <hr />
-        <div class="input-group mb-3 fs-5">
-          {#if task.keyword.length > 0}
-            {#each task.keyword.split(" ") as w}
-              <div class="m-1 badge bg-info text-dark">{w}</div>
-            {/each}
+        {#if detailOpenList[i] !== undefined}
+          {#if task.active}
+            {dayjs(task.timer).diff(nowDt, "s")} 秒
+            <hr />
+            <span class="badge {task.active ? 'bg-primary' : 'bg-secondary'}">
+              {dayjs(task.timer).format("YYYY-MM-DD HH:mm:ss")}
+            </span>
           {/if}
-        </div>
-        <hr />
-        {#each task.checkList as chk, i}
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id={"chkbox-" + i}
-              checked={chk.checked}
-              on:change={(e) => task.changeCheck(i, e.target.checked)}
-            />
-            <label class="form-check-label" for={"chkbox-" + i}
-              >{chk.text}</label
-            >
+          <span class="badge {task.active ? 'bg-primary' : 'bg-secondary'}">
+            {task.timer_display.hour}時
+            {task.timer_display.min}分
+            {task.timer_display.sec}秒
+          </span>
+          <div class="input-group mb-3 fs-5">
+            {#if task.keyword.length > 0}
+              {#each task.keyword.split(" ") as w}
+                <div class="m-1 badge bg-info text-dark">{w}</div>
+              {/each}
+            {/if}
           </div>
-        {/each}
-        <hr />
-        <button
-          class="btn {!task.active ? 'btn-primary' : 'btn-secondary'}"
-          on:click={() => task.change_active(!task.active)}
-          >{!task.active ? "activete" : "passivate"}</button
-        >
-        <button class="btn btn-danger" on:click={() => task.remove()}
-          >remove</button
-        >
-        <button class="btn btn-success" on:click={() => task.edit()}
-          >edit</button
-        >
-        <button class="btn btn-info" on:click={() => task.duplicate()}
-          >duplicate</button
-        >
+          <hr />
+          {#each task.checkList as chk, i}
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id={"chkbox-" + i}
+                checked={chk.checked}
+                on:change={(e) => task.changeCheck(i, e.target.checked)}
+              />
+              <label class="form-check-label" for={"chkbox-" + i}
+                >{chk.text}</label
+              >
+            </div>
+          {/each}
+          <hr />
+          <button
+            class="btn {!task.active ? 'btn-primary' : 'btn-secondary'}"
+            on:click={() => task.change_active(!task.active)}
+            >{!task.active ? "activete" : "passivate"}</button
+          >
+          <button class="btn btn-danger" on:click={() => task.remove()}
+            >remove</button
+          >
+          <button class="btn btn-success" on:click={() => task.edit()}
+            >edit</button
+          >
+          <button class="btn btn-info" on:click={() => task.duplicate()}
+            >duplicate</button
+          >
+        {/if}
       </li>
     {/each}
   </ul>
 </div>
+
+<style>
+  .passive-task {
+    border-left: medium solid gray;
+  }
+  .active-task {
+    border-left: medium solid red;
+  }
+  .detail-close {
+    display: none !important;
+  }
+</style>

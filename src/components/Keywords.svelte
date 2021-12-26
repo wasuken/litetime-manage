@@ -72,19 +72,6 @@
 </script>
 
 <div>
-  <button
-    class="btn btn-primary m-3"
-    data-bs-toggle="collapse"
-    data-bs-target="#collapseKeywords"
-    aria-expanded="false"
-    aria-controls="collapseKeywords"
-  >
-    キーワード操作
-  </button>
-  <div
-    class="collapse container-fluid shadow p-3 mb-5 bg-body rounded"
-    id="collapseKeywords"
-  >
     {#if keys.length > 0}
       {#each keys as w, i}
         <div class="form-check form-check-inline">
@@ -119,5 +106,4 @@
     <button class="btn btn-danger" on:click={() => removeHasCheckKeys(true)}>
       Remove
     </button>
-  </div>
 </div>

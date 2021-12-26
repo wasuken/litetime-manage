@@ -37,8 +37,7 @@
     keyword: "",
     checkListText: "",
   });
-  let activeTasks = [];
-  let passiveTasks = [];
+  let taskList = [];
 
   function handleSaveTasks() {
     localStorage.setItem("tasks", JSON.stringify($tasks));
@@ -86,15 +85,10 @@
     }
   }
   tasks.subscribe((ts) => {
-    activeTasks = [];
-    passiveTasks = [];
+    taskList = [];
     if (ts) {
       Object.values(ts).forEach((t) => {
-        if (t.active) {
-          activeTasks.push(t);
-        } else {
-          passiveTasks.push(t);
-        }
+        taskList.push(t);
       });
     }
   });
@@ -134,16 +128,38 @@
       <button class="btn btn-primary m-3" on:click={() => handleSaveTasks()}>
         SaveTasks
       </button>
+      <button
+          class="btn btn-primary m-3"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#collapseInput"
+                          aria-expanded="false"
+                          aria-controls="collapseInput"
+                          >
+                          追加
+      </button>
+        <button
+            class="btn btn-primary m-3"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseKeywords"
+                            aria-expanded="false"
+                            aria-controls="collapseKeywords"
+                            >
+                            キーワード操作
+  </button>
     </div>
-    <TaskAdd />
-    <Keywords />
+    <div id="collapseInput"
+      class="collapse container shadow p-3 mb-5 bg-body rounded">
+      <TaskAdd />
+    </div>
+    <div id="collapseKeywords"
+         class="collapse container shadow p-3 mb-5 bg-body rounded">
+      <Keywords />
+    </div>
   </div>
   <div class="row">
-    <div class="col-md-6 col-xs-12">
-      <TaskList tks={activeTasks} title="アクティブタスクリスト" />
-    </div>
-    <div class="col-md-6 col-xs-12">
-      <TaskList tks={passiveTasks} title="パッシブタスクリスト" />
+    <div class="col-md-12 col-xs-12">
+      <TaskList tks={taskList} title="タスクリスト" />
     </div>
   </div>
 </div>
