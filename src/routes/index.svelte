@@ -126,7 +126,7 @@
   <div class="container-fluid">
     <div>
       <button class="btn btn-primary m-3" on:click={() => handleSaveTasks()}>
-        SaveTasks
+        Todoを保存する
       </button>
       <button
           class="btn btn-primary m-3"
