@@ -34,22 +34,28 @@
     checkListText: "",
   });
   function add() {
-    if (!isDateTimeLocal) {
-      let ui = {
-        ...$userInput,
-        timer: dayjs()
-          .add($userInput.timer_display.min, "m")
-          .add($userInput.timer_display.sec, "s")
-          .add($userInput.timer_display.hour, "h"),
-      };
-      userInput.set(ui);
-    }
+    let ui = { ...$userInput };
+	if (!isDateTimeLocal) {
+      ui.timer = dayjs()
+		.add($userInput.timer_display.min, "m")
+		.add($userInput.timer_display.sec, "s")
+		.add($userInput.timer_display.hour, "h")
+	}
+	// null潰し
+	ui.timer_display.min = ui.timer_display.min ?? 0;
+	ui.timer_display.sec = ui.timer_display.sec ?? 0;
+	ui.timer_display.hour = ui.timer_display.hour ?? 0;
+	userInput.set(ui);
+
     tasks.update((ts) => {
       const k = genUKey();
       let tts = { ...ts };
       let chks = [];
-      if ($userInput.checkListText.trim() > 0) {
-        chks = $userInput.checkListText.split(" ").map((x) => {
+      if (ui.checkListText.trim().length > 0) {
+        chks = $userInput.checkListText
+          .split(" ")
+          .filter((x) => x.length > 0)
+          .map((x) => {
           return {
             text: x,
             checked: false,
