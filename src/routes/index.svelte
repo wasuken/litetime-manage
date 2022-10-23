@@ -1,115 +1,115 @@
 <script>
-  import TaskList from "../components/TaskList.svelte";
-  import Keywords from "../components/Keywords.svelte";
-  import TaskAdd from "../components/TaskAdd.svelte";
-  import { userInput, tasks, saveTasks } from "../stores/tasks.js";
-  import {
-    genUKey,
-    removeF,
-    activeF,
-    editF,
-    duplicateF,
-    changeCheckF,
-  } from "../const.js";
+ import TaskList from "../components/TaskList.svelte";
+ import Keywords from "../components/Keywords.svelte";
+ import TaskAdd from "../components/TaskAdd.svelte";
+ import { userInput, tasks, saveTasks } from "../stores/tasks.js";
+ import {
+   genUKey,
+   removeF,
+   activeF,
+   editF,
+   duplicateF,
+   changeCheckF,
+ } from "../const.js";
 
-  import dayjs from "dayjs";
-  import utc from "dayjs/plugin/utc.js";
-  dayjs.extend(utc);
-  import { onMount } from "svelte";
+ import dayjs from "dayjs";
+ import utc from "dayjs/plugin/utc.js";
+ dayjs.extend(utc);
+ import { onMount } from "svelte";
 
-  let minSec = {
-    min: 0,
-    sec: 0,
-    hour: 0,
-  };
-  let isDateTimeLocal = false;
+ let minSec = {
+   min: 0,
+   sec: 0,
+   hour: 0,
+ };
+ let isDateTimeLocal = false;
 
-  let time = dayjs();
-  userInput.set({
-    title: "",
-    timer: dayjs(),
-    timer_display: {
-      min: 0,
-      sec: 0,
-      hour: 0,
-    },
-    active: false,
-    keyword: "",
-    checkListText: "",
-  });
-  let taskList = [];
+ let time = dayjs();
+ userInput.set({
+   title: "",
+   timer: dayjs(),
+   timer_display: {
+     min: 0,
+     sec: 0,
+     hour: 0,
+   },
+   active: true,
+   keyword: "",
+   checkListText: "",
+ });
+ let taskList = [];
 
-  function handleSaveTasks() {
-    localStorage.setItem("tasks", JSON.stringify($tasks));
-  }
+ function handleSaveTasks() {
+   localStorage.setItem("tasks", JSON.stringify($tasks));
+ }
 
-  onMount(() => {
-    let storedTasks = {};
-    try {
-      let ts = localStorage.getItem("tasks");
-      if (!ts) {
-        ts = "{}";
-      }
-      storedTasks = JSON.parse(ts);
-      Object.keys(storedTasks).forEach((k) => {
-        storedTasks[k] = {
-          ...storedTasks[k],
-          remove: removeF(k),
-          edit: editF(k),
-          change_active: activeF(k),
-          duplicate: duplicateF(k),
-          changeCheck: changeCheckF(k),
-        };
-      });
-    } catch (e) {
-      console.log(e);
-      storedTasks = {};
-    }
-    tasks.set(storedTasks);
-  });
+ onMount(() => {
+   let storedTasks = {};
+   try {
+     let ts = localStorage.getItem("tasks");
+     if (!ts) {
+       ts = "{}";
+     }
+     storedTasks = JSON.parse(ts);
+     Object.keys(storedTasks).forEach((k) => {
+       storedTasks[k] = {
+         ...storedTasks[k],
+         remove: removeF(k),
+         edit: editF(k),
+         change_active: activeF(k),
+         duplicate: duplicateF(k),
+         changeCheck: changeCheckF(k),
+       };
+     });
+   } catch (e) {
+     console.log(e);
+     storedTasks = {};
+   }
+   tasks.set(storedTasks);
+ });
 
-  const title = "タスクアラート";
-  $: {
-    let tks = { ...$tasks };
-    if ($tasks) {
-      Object.keys($tasks).forEach((k, i) => {
-        const t = $tasks[k];
-        if (t.active === true) {
-          if (dayjs(t.timer).diff(time) <= 0) {
-            t.change_active(false);
-            document.querySelector("#sound-file").play();
-            alert(`[${t.title}] :経過`);
-          }
-        }
-      });
-    }
-  }
-  tasks.subscribe((ts) => {
-    taskList = [];
-    if (ts) {
-      Object.values(ts).forEach((t) => {
-        taskList.push(t);
-      });
-    }
-  });
-  onMount(() => {
-    const interval = setInterval(() => {
-      time = dayjs();
-    }, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  });
-  function handleInputKeyword(e) {
-    if (e.data === " ") {
-      const kws = $userInput.keyword.split(" ");
-      const ukw = kws.filter((v, i, a) => a.indexOf(v) === i).join(" ");
-      userInput.set({
-        ...$userInput,
-        keyword: ukw,
-      });
-    }
-  }
+ const title = "タスクアラート";
+ $: {
+   let tks = { ...$tasks };
+   if ($tasks) {
+     Object.keys($tasks).forEach((k, i) => {
+       const t = $tasks[k];
+       if (t.active === true) {
+         if (dayjs(t.timer).diff(time) <= 0) {
+           t.change_active(true);
+           document.querySelector("#sound-file").play();
+           alert(`[${t.title}] :経過`);
+         }
+       }
+     });
+   }
+ }
+ tasks.subscribe((ts) => {
+   taskList = [];
+   if (ts) {
+     Object.values(ts).forEach((t) => {
+       taskList.push(t);
+     });
+   }
+ });
+ onMount(() => {
+   const interval = setInterval(() => {
+     time = dayjs();
+   }, 1000);
+   return () => {
+     clearInterval(interval);
+   };
+ });
+ function handleInputKeyword(e) {
+   if (e.data === " ") {
+     const kws = $userInput.keyword.split(" ");
+     const ukw = kws.filter((v, i, a) => a.indexOf(v) === i).join(" ");
+     userInput.set({
+       ...$userInput,
+       keyword: ukw,
+     });
+   }
+ }
 </script>
 
 <div class="container-fluid">
