@@ -5,9 +5,16 @@
   import { onMount } from "svelte";
   import { userInput, tasks } from "../stores/tasks.js";
   dayjs.extend(utc);
-  export let title = "タスクアラート";
+ export let title = "タスクアラート";
 
-  let nowDt = dayjs();
+ function sec_format(sec){
+   const h = Math.floor(sec / 60 / 60);
+   const m = Math.floor((sec - (h * 60)) / 60);
+   const s = Math.floor(sec - (h * 60 * 60) - (m * 60));
+   return `${h}:${m}:${s}`;
+ }
+
+ let nowDt = dayjs();
 
   onMount(() => {
     const interval = setInterval(() => {
@@ -30,7 +37,6 @@
     checkListText: "",
   });
  export let tks = [];
- console.log(tks);
 </script>
 
 <div class="container-fluid shadow p-3 mb-5 bg-body rounded">
@@ -46,7 +52,8 @@
         </h4>
         {#if !task.omit}
           {#if task.active}
-            {dayjs(task.timer).diff(nowDt, "s")} 秒
+            {sec_format(dayjs(task.timer).diff(nowDt, "s"))}
+			({dayjs(task.timer).diff(nowDt, "s")} 秒)
             <hr />
             <span class="badge {task.active ? 'bg-primary' : 'bg-secondary'}">
               {dayjs(task.timer).format("YYYY-MM-DD HH:mm:ss")}
@@ -108,9 +115,6 @@
   }
   .active-task {
     border-left: medium solid red;
-  }
-  .detail-close {
-    display: none !important;
   }
   .list-cursor{
     cursor: pointer;
