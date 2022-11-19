@@ -51,7 +51,7 @@ export function activeF(ind) {
       } else {
         tts[ind].passived_timer = dayjs();
       }
-      tts[ind].active = bl;
+		tts[ind].active = bl;
       return tts;
     });
   };

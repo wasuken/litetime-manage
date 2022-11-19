@@ -5,9 +5,16 @@
   import { onMount } from "svelte";
   import { userInput, tasks } from "../stores/tasks.js";
   dayjs.extend(utc);
-  export let title = "タスクアラート";
+ export let title = "タスクアラート";
 
-  let nowDt = dayjs();
+ function sec_format(sec){
+   const h = Math.floor(sec / 60 / 60);
+   const m = Math.floor((sec - (h * 60)) / 60);
+   const s = Math.floor(sec - (h * 60 * 60) - (m * 60));
+   return `${h}:${m}:${s}`;
+ }
+
+ let nowDt = dayjs();
 
   onMount(() => {
     const interval = setInterval(() => {
@@ -29,28 +36,24 @@
     keyword: "",
     checkListText: "",
   });
-  export let tks = [];
-  let detailOpenList = [];
-  function handleDetail(i) {
-    if (detailOpenList[i]) {
-      delete detailOpenList[i];
-    } else {
-      detailOpenList[i] = 1;
-    }
-  }
+ export let tks = [];
 </script>
 
 <div class="container-fluid shadow p-3 mb-5 bg-body rounded">
   <h3>{title}</h3>
   <ul class="list-group">
     {#each tks as task, i}
-      <li class="list-cursor list-group-item m-2 {task.active ? 'active-task' : 'passive-task'}" on:click={() => handleDetail(i)}>
-        <p>
-          {task.title}
-        </p>
-        {#if detailOpenList[i] !== undefined}
+      <li class="list-cursor list-group-item m-2 {task.active ? 'active-task' : 'passive-task'}">
+        <h4 class="d-flex justify-content-between">
+		  {task.title}
+		  <button class="btn btn-outline-primary" on:click={() => task.omit = !task.omit}>
+			{task.omit ? "open" : "omit"}
+		  </button>
+        </h4>
+        {#if !task.omit}
           {#if task.active}
-            {dayjs(task.timer).diff(nowDt, "s")} 秒
+            {sec_format(dayjs(task.timer).diff(nowDt, "s"))}
+			({dayjs(task.timer).diff(nowDt, "s")} 秒)
             <hr />
             <span class="badge {task.active ? 'bg-primary' : 'bg-secondary'}">
               {dayjs(task.timer).format("YYYY-MM-DD HH:mm:ss")}
@@ -69,7 +72,8 @@
             {/if}
           </div>
           <hr />
-          {#each task.checkList as chk, i}
+		  {#if task.checkList.length > 0}
+			{#each task.checkList as chk, i}
             <div class="form-check">
               <input
                 class="form-check-input"
@@ -79,11 +83,12 @@
                 on:change={(e) => task.changeCheck(i, e.target.checked)}
               />
               <label class="form-check-label" for={"chkbox-" + i}
-                >{chk.text}</label
-              >
+              >{chk.text}</label
+						 >
             </div>
-          {/each}
-          <hr />
+			{/each}
+			<hr />
+		  {/if}
           <button
             class="btn {!task.active ? 'btn-primary' : 'btn-secondary'}"
             on:click={() => task.change_active(!task.active)}
@@ -110,9 +115,6 @@
   }
   .active-task {
     border-left: medium solid red;
-  }
-  .detail-close {
-    display: none !important;
   }
   .list-cursor{
     cursor: pointer;
